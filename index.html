@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1688 &amp; AliExpress to Shopify Importer — Free CSV with Landed Cost</title>
+<meta name="description" content="Turn a 1688 or AliExpress product page into an import-ready Shopify CSV — color × size variants, per-SKU landed cost and price, images bound. Free, runs locally.">
+<link rel="canonical" href="https://socialgrabberapp.github.io/DropshippingExporter/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1688/AliExpress to Shopify Importer">
+<meta property="og:title" content="1688 &amp; AliExpress to Shopify Importer — import-ready CSV with landed cost per SKU">
+<meta property="og:description" content="Reads the 1688 or AliExpress product page you are viewing, unfolds the variant matrix, costs every SKU from your own freight and profit numbers, and exports a Shopify CSV that imports as-is.">
+<meta property="og:url" content="https://socialgrabberapp.github.io/DropshippingExporter/">
+<meta property="og:image" content="https://socialgrabberapp.github.io/DropshippingExporter/assets/screenshot-1688-panel.png">
+<link rel="icon" type="image/png" sizes="128x128" href="assets/icon-128.png">
+<!-- ⚠️ 上架当天要改的三处（都在本文件里，搜 "上架当天" 能找到）：
+     ① 主按钮：取消 CTA 注释、换成商店链接，并删掉"Coming soon"那行
+     ② Edge 按钮：Edge 上架后取消注释、填链接
+     ③ 下面这个 JSON-LD：补一行 downloadUrl -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "1688/AliExpress to Shopify Importer",
+  "applicationCategory": "BrowserApplication",
+  "operatingSystem": "Chrome",
+  "description": "Browser extension that turns a 1688 or AliExpress product page into an import-ready Shopify CSV: color × size variants unfolded, per-SKU landed cost and prices, images and color swatches bound. Runs locally; no product data is uploaded.",
+  "url": "https://socialgrabberapp.github.io/DropshippingExporter/",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f9; --card: #ffffff; --text: #24292f; --muted: #656d76;
+    --line: #e3e6ea; --accent: #00795c; --btn: #008060; --btn-hover: #006b50;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14171c; --card: #1c2027; --text: #d7dde3; --muted: #9aa4ad;
+            --line: #31363f; --accent: #3ec9a0; --btn: #008060; --btn-hover: #006b50; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.7 system-ui, "Segoe UI", "Microsoft YaHei", sans-serif; }
+  a { color: var(--accent); }
+  img { max-width: 100%; height: auto; display: block; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+  header { border-bottom: 1px solid var(--line); background: var(--card); }
+  .nav { display: flex; align-items: center; gap: 20px; padding: 13px 0; }
+  .brand { font-weight: 700; font-size: 16.5px; color: var(--text); text-decoration: none; }
+  .navlinks { margin-left: auto; display: flex; gap: 18px; flex-wrap: wrap; }
+  .navlinks a { color: var(--muted); text-decoration: none; font-size: 14px; }
+  .navlinks a:hover { color: var(--accent); }
+  section { padding: 44px 0; }
+  h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.28; margin: 0 0 14px; }
+  h2 { font-size: 24px; margin: 0 0 10px; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  .lead { color: var(--muted); font-size: 17px; margin: 0 0 22px; }
+  .hero { display: grid; grid-template-columns: 1.02fr 0.98fr; gap: 36px;
+          align-items: center; padding-top: 52px; }
+  .hero .sub { font-size: 17px; color: var(--muted); margin: 0; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin: 22px 0 12px; }
+  .btn { display: inline-block; border-radius: 9px; padding: 13px 22px;
+         font-weight: 600; font-size: 15px; text-decoration: none; line-height: 1.2; }
+  .btn-primary { background: var(--btn); color: #fff; }
+  .btn-primary:hover { background: var(--btn-hover); }
+  .btn-ghost { border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  .btn-pending { border: 1px dashed var(--line); color: var(--muted); background: transparent; }
+  .factrow { color: var(--muted); font-size: 14px; margin: 0; }
+  .shot img { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .card p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px;
+             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  ol.steps li { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  ol.steps .n { display: inline-flex; width: 26px; height: 26px; border-radius: 50%;
+                background: var(--btn); color: #fff; align-items: center; justify-content: center;
+                font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+  ol.steps p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .shots { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: 13.5px; margin-top: 8px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+            padding: 14px 18px; margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 600; font-size: 15.5px; }
+  details p { margin: 10px 0 2px; color: var(--muted); font-size: 14.5px; }
+  footer { border-top: 1px solid var(--line); background: var(--card); padding: 28px 0 36px; }
+  footer .links { display: flex; gap: 18px; flex-wrap: wrap; margin: 0; }
+  footer .links a { color: var(--muted); text-decoration: none; font-size: 14px; }
+  footer .links a:hover { color: var(--accent); }
+  footer .tiny { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin: 14px 0 0; }
+  @media (max-width: 820px) { .hero { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body id="top">
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top">1688/AliExpress to Shopify Importer</a>
+    <nav class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#screens">In action</a>
+      <a href="#faq">FAQ</a>
+      <a href="#zh" lang="zh-CN">中文</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div>
+      <h1>Import 1688 and AliExpress products to Shopify — variants, landed cost and images in one CSV</h1>
+      <p class="sub">A free Chrome extension for the way you already source: open a 1688 or AliExpress product page and a panel opens alongside it. It reads that page's own product data, unfolds the color × size variant matrix into Shopify's rows and costs every SKU from your own freight and profit numbers — then exports a CSV that imports as-is. No account, no store API keys, no server.</p>
+      <p class="cta">
+        <!-- ⚠️ 上架当天 ①：把下面三行注释解开，⟨CWS_ITEM_ID⟩ 换成你的商店 item ID（后台地址栏里那串），然后删掉"Coming soon"那一行
+        <a class="btn btn-primary" href="https://chromewebstore.google.com/detail/⟨CWS_ITEM_ID⟩">Add to Chrome — it's free</a>
+        -->
+        <span class="btn btn-pending">Coming soon to the Chrome Web Store</span>
+        <!-- ⚠️ 上架当天 ②（Edge，等 Edge 商店过审后再做）：取消下面注释并填链接
+        <a class="btn btn-ghost" href="EDGE_LISTING_URL">Get it for Edge</a>
+        -->
+      </p>
+      <p class="factrow">Free · No sign-up · No store API keys · Runs locally — no product data is uploaded</p>
+    </div>
+    <figure class="shot">
+      <img src="assets/screenshot-1688-panel.png" width="1280" height="800" alt="The importer panel beside a 1688 product page: variant notes, per-SKU profit calculator and the Export Shopify CSV button">
+    </figure>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <h2>From product page to Shopify in three steps</h2>
+      <p class="lead">No link copying, no spreadsheet gymnastics, no store API keys.</p>
+      <ol class="steps">
+        <li><span class="n">1</span><h3>Open a product page</h3><p>Browse 1688 or AliExpress (aliexpress.com / aliexpress.us) as usual. The panel opens alongside the page and captures the product automatically — including its color × size variant matrix.</p></li>
+        <li><span class="n">2</span><h3>Check what it read</h3><p>Variants, prices, weights and images are listed with their sources: rows with no match in the source table are flagged instead of guessed at, and the panel says which weight it used for each SKU. The exchange rate is the number you typed in, shown with the day you typed it.</p></li>
+        <li><span class="n">3</span><h3>Export and import</h3><p>Click “Export Shopify CSV”, then upload the file in your Shopify admin (Products → Import). Variants, prices, swatches and media arrive from the file. Re-import later to push new prices — handles match, so products update instead of duplicating.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>What lands in your Shopify admin</h2>
+      <p class="lead">Everything is prepared on the product page, priced with your numbers, and delivered as one file.</p>
+      <div class="grid">
+        <div class="card"><h3>Variants unfolded</h3><p>The color × size matrix becomes one Shopify row per variant, with SKUs, option names and values in the right columns.</p></div>
+        <div class="card"><h3>Landed cost per SKU</h3><p>Every variant is costed from your per-kilo freight and expected profit. Weight comes from the variant first, then the listing, then a default — and the panel labels which one was used.</p></div>
+        <div class="card"><h3>Import-ready CSV</h3><p>Column names and order follow the template Shopify offers on its own import page, so there is nothing to fix up in Excel first.</p></div>
+        <div class="card"><h3>Images come along</h3><p>Image cells reference the marketplace's public URLs and Shopify pulls them in during import. Each variant is bound to its own color swatch automatically — no clicking through the admin one by one.</p></div>
+        <div class="card"><h3>Long promo strips, dropped</h3><p>Chinese promo graphics and size-chart strips bake into the gallery. Untick them in the image filter — or let “Uncheck all long images” do it — before the CSV is built.</p></div>
+        <div class="card"><h3>Product notebook</h3><p>Save products while you browse: your shortlist keeps source cost, landed cost, Shopify price and margin in one list, stored in your browser.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screens">
+    <div class="wrap">
+      <h2>In action</h2>
+      <div class="shots">
+        <figure>
+          <img src="assets/screenshot-image-filter.png" width="1280" height="800" loading="lazy" alt="Pick images to export dialog listing main images and description images with checkboxes">
+          <figcaption>Pick images to export: 15 of 15 selected here — uncheck the long promo strips, or uncheck all long images in one click.</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/screenshot-shopify-imported.png" width="1280" height="800" loading="lazy" alt="The imported product in Shopify admin: media grid, variants, Vendor 1688 and Active status">
+          <figcaption>After importing the CSV in Shopify admin: media pulled from the source page, variants and the Active status — all from the file.</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/screenshot-aliexpress-panel.png" width="1280" height="800" loading="lazy" alt="The same panel on an AliExpress product page, costing a variant in USD">
+          <figcaption>AliExpress product pages work the same way — read from the page, costed with your freight and profit, exported with the same button.</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/screenshot-notebook.png" width="1280" height="800" loading="lazy" alt="The product notebook popup listing saved products with source cost, landed cost, Shopify price and margin">
+          <figcaption>The product notebook: every saved product with source cost, landed cost, Shopify price and margin — kept in your browser.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>Frequently asked questions</h2>
+      <details>
+        <summary>How do I import 1688 products to Shopify?</summary>
+        <p>Open the product page in your browser and the panel captures it automatically. Click “Export Shopify CSV”, then in your Shopify admin go to Products → Import and upload the file. It imports as-is — the column names and order follow the template Shopify offers on its own import page — and Shopify fetches the product images from the marketplace's public URLs during import.</p>
+      </details>
+      <details>
+        <summary>Does it work with AliExpress too?</summary>
+        <p>Yes. It runs on 1688 and AliExpress product pages (aliexpress.com and aliexpress.us). The same panel appears, the same variant matrix and pricing apply, and the export is the same import-ready CSV.</p>
+      </details>
+      <details>
+        <summary>How is the landed cost and suggested price calculated?</summary>
+        <p>Per SKU, from numbers you control: your per-kilo freight rate and your expected profit. Weight comes from the variant's own gram weight first, then the listing weight, then a default — the panel labels which one it used. The exchange rate is a number you type in yourself; the panel shows the day you entered it and warns you once it is more than 7 days old. The panel shows its work line by line: source cost, freight, price and margin.</p>
+      </details>
+      <details>
+        <summary>Do the images come across, and can variants get their own swatch?</summary>
+        <p>Yes. Image cells in the CSV reference the marketplace's public image addresses, and Shopify pulls them in during import — no re-downloading and re-uploading. Each variant is bound to its own color swatch automatically. You can also download the selected images as a local zip instead.</p>
+      </details>
+      <details>
+        <summary>Can I update products I already imported?</summary>
+        <p>Yes — re-export and re-import with “Overwrite products with matching handles”. Every handle embeds the product ID, so it matches the same product instead of creating a duplicate, and columns that are not in the CSV are left untouched.</p>
+      </details>
+      <details>
+        <summary>Is it free? Do I need an account or API keys?</summary>
+        <p>Free, with no account and no sign-up. There are no store API keys and the extension never connects to your Shopify store — you import the CSV yourself, so nothing needs access to your admin, and there is no app to install on Shopify's side.</p>
+      </details>
+      <details>
+        <summary>Does it collect or upload my data?</summary>
+        <p>No server, no ads, no analytics. The product data on the page you are viewing is parsed in your own browser's memory — titles, prices, variants and image addresses are never uploaded, and the CSV and image zip are files you choose to download yourself. Your pricing parameters live in Chrome's own extension storage and sync through your own Chrome account, governed by Chrome's privacy notice. See the <a href="privacy-policy.html">privacy policy</a> for the details.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="zh" lang="zh-CN">
+    <div class="wrap">
+      <h2>中文说明</h2>
+      <p class="lead">1688/速卖通采集铺货助手是一个浏览器扩展：浏览 1688 或速卖通的商品详情页时，页面右侧会出现解析面板（可收起），它读取该页面自己的商品数据，把颜色 × 尺码的变体矩阵拆成 Shopify 要的「一行一个变体」，按你填的每公斤运费与期望利润逐 SKU 算出到岸成本和建议售价，一键导出可直接导入的 Shopify CSV。无需注册、无需店铺 API 密钥、没有服务器、没有统计。</p>
+      <div class="grid">
+        <div class="card"><h3>变体拆分</h3><p>颜色 × 尺码拆成一行一个变体，SKU、规格名与取值按 Shopify 的口径落列。</p></div>
+        <div class="card"><h3>到岸成本精算</h3><p>每个变体按你填的每公斤运费与期望利润算价；重量优先取变体克重，其次整品重量，最后兜底默认值，用的是哪一档面板会标出来。</p></div>
+        <div class="card"><h3>直接可导入的 CSV</h3><p>列名与列序取自 Shopify 官方导入页提供的模板，不用回 Excel 改列。</p></div>
+        <div class="card"><h3>图片自动带到</h3><p>图片列引用源站公开图片地址，Shopify 导入时自行抓取；每个变体自动绑上自己的色卡图，也可以把勾选的图片打包成本地 zip。</p></div>
+        <div class="card"><h3>长图一键剔除</h3><p>中文牛皮癣长图、尺码表长条可以在图片筛选弹窗里取消勾选，或一键取消全部长图，不进店铺图集。</p></div>
+        <div class="card"><h3>爆款灵感库</h3><p>浏览时保存候选商品：进价、到岸成本、售价与毛利率排成一张清单，数据存在本机浏览器里。</p></div>
+      </div>
+      <details>
+        <summary>1688 商品怎么铺到 Shopify？</summary>
+        <p>在浏览器里打开商品详情页，右侧面板会自动识别；点「Export Shopify CSV」导出，然后到 Shopify 后台 Products → Import 上传这份文件即可，列名与列序按官方导入模板，不用改。图片引用源站公开地址，由 Shopify 导入时自己抓取。</p>
+      </details>
+      <details>
+        <summary>到岸成本和售价是怎么算的？</summary>
+        <p>逐 SKU 按你填的「每公斤运费 + 期望利润」计算。重量优先取变体自带的克重，取不到才回退到整品重量或默认值，面板会标出这一档数字是哪来的。汇率是你手填的，面板标出填入日期，超过 7 天变红提醒你核对——扩展自己不查汇率。</p>
+      </details>
+      <details>
+        <summary>数据会被上传吗？</summary>
+        <p>没有服务器、没有广告、没有统计。商品数据在你自己的浏览器内存里解析，标题、价格、变体、图片地址都不上传；导出的 CSV 与图片 zip 是你自己下载到本机的文件。定价参数保存在 Chrome 扩展存储里，通过你自己的 Chrome 账号同步，受 Chrome 隐私政策约束。详见<a href="privacy-policy.html">隐私政策</a>。</p>
+      </details>
+      <p class="cta">
+        <!-- 上架当天 ①（同上）：中文按钮与英文按钮用同一个链接
+        <a class="btn btn-primary" href="https://chromewebstore.google.com/detail/⟨CWS_ITEM_ID⟩">添加到 Chrome</a>
+        -->
+        <span class="btn btn-pending">即将上架 Chrome 应用商店</span>
+      </p>
+      <p class="factrow">免费 · 无需注册 · 无需店铺 API 密钥 · 纯本地运行，不上传商品数据</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="links">
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="https://github.com/socialgrabberapp/DropshippingExporter/issues">Support</a>
+      <a href="mailto:socialgrabber.app@gmail.com">socialgrabber.app@gmail.com</a>
+    </p>
+    <p class="tiny">1688/AliExpress to Shopify Importer is not affiliated with Alibaba Group (1688, AliExpress) or Shopify Inc.; all product names and trademarks belong to their respective owners. Use it only with products and images you are entitled to use — you are responsible for complying with each marketplace's terms of service and your local laws.</p>
+    <p class="tiny">© 2026 1688/AliExpress to Shopify Importer</p>
+  </div>
+</footer>
+
+</body>
+</html>
