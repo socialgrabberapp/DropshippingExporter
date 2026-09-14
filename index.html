@@ -92,6 +92,22 @@
   footer .links a:hover { color: var(--accent); }
   footer .tiny { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin: 14px 0 0; }
   @media (max-width: 820px) { .hero { grid-template-columns: 1fr; } }
+  /* click-to-enlarge (no JavaScript) */
+  figure.zoom > a.shot { display: block; cursor: zoom-in; }
+  figure.zoom > a.shot:hover img { border-color: var(--accent); }
+  figure.zoom .lb-backdrop, figure.zoom .lb-close { display: none; }
+  figure.zoom:target { position: fixed; inset: 0; z-index: 90; margin: 0; padding: 3vmin;
+    display: flex; align-items: center; justify-content: center; background: rgba(9, 11, 13, .92); }
+  figure.zoom:target .lb-backdrop { display: block; position: absolute; inset: 0; cursor: zoom-out; }
+  figure.zoom:target > a.shot { pointer-events: none; }
+  figure.zoom:target img { width: auto; height: auto; max-width: 96vw; max-height: 88vh;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .55); }
+  figure.zoom:target figcaption { display: none; }
+  figure.zoom:target .lb-close { display: flex; align-items: center; justify-content: center;
+    position: absolute; top: 14px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255, 255, 255, .16); color: #fff; font-size: 22px; line-height: 1;
+    text-decoration: none; }
+  figure.zoom:target .lb-close:hover { background: rgba(255, 255, 255, .32); }
 </style>
 </head>
 <body id="top">
@@ -125,8 +141,12 @@
       </p>
       <p class="factrow">Free · No sign-up · No store API keys · Runs locally — no product data is uploaded</p>
     </div>
-    <figure class="shot">
-      <img src="assets/screenshot-1688-panel.png" width="1280" height="800" alt="The importer panel beside a 1688 product page: variant notes, per-SKU profit calculator and the Export Shopify CSV button">
+    <figure class="shot zoom" id="shot-hero">
+      <a class="lb-backdrop" href="#!" aria-label="Close enlarged view" tabindex="-1"></a>
+      <a class="shot" href="#shot-hero">
+        <img src="assets/screenshot-1688-panel.png" width="1280" height="800" alt="The importer panel beside a 1688 product page: variant notes, per-SKU profit calculator and the Export Shopify CSV button">
+      </a>
+      <a class="lb-close" href="#!" aria-label="Close enlarged view">&times;</a>
     </figure>
   </section>
 
@@ -161,21 +181,37 @@
     <div class="wrap">
       <h2>In action</h2>
       <div class="shots">
-        <figure>
-          <img src="assets/screenshot-image-filter.png" width="1280" height="800" loading="lazy" alt="Pick images to export dialog listing main images and description images with checkboxes">
+        <figure class="zoom" id="shot-1">
+          <a class="lb-backdrop" href="#!" aria-label="Close enlarged view" tabindex="-1"></a>
+          <a class="shot" href="#shot-1">
+            <img src="assets/screenshot-image-filter.png" width="1280" height="800" loading="lazy" alt="Pick images to export dialog listing main images and description images with checkboxes">
+          </a>
           <figcaption>Pick images to export: 15 of 15 selected here — uncheck the long promo strips, or uncheck all long images in one click.</figcaption>
+          <a class="lb-close" href="#!" aria-label="Close enlarged view">&times;</a>
         </figure>
-        <figure>
-          <img src="assets/screenshot-shopify-imported.png" width="1280" height="800" loading="lazy" alt="The imported product in Shopify admin: media grid, variants, Vendor 1688 and Active status">
+        <figure class="zoom" id="shot-2">
+          <a class="lb-backdrop" href="#!" aria-label="Close enlarged view" tabindex="-1"></a>
+          <a class="shot" href="#shot-2">
+            <img src="assets/screenshot-shopify-imported.png" width="1280" height="800" loading="lazy" alt="The imported product in Shopify admin: media grid, variants, Vendor 1688 and Active status">
+          </a>
           <figcaption>After importing the CSV in Shopify admin: media pulled from the source page, variants and the Active status — all from the file.</figcaption>
+          <a class="lb-close" href="#!" aria-label="Close enlarged view">&times;</a>
         </figure>
-        <figure>
-          <img src="assets/screenshot-aliexpress-panel.png" width="1280" height="800" loading="lazy" alt="The same panel on an AliExpress product page, costing a variant in USD">
+        <figure class="zoom" id="shot-3">
+          <a class="lb-backdrop" href="#!" aria-label="Close enlarged view" tabindex="-1"></a>
+          <a class="shot" href="#shot-3">
+            <img src="assets/screenshot-aliexpress-panel.png" width="1280" height="800" loading="lazy" alt="The same panel on an AliExpress product page, costing a variant in USD">
+          </a>
           <figcaption>AliExpress product pages work the same way — read from the page, costed with your freight and profit, exported with the same button.</figcaption>
+          <a class="lb-close" href="#!" aria-label="Close enlarged view">&times;</a>
         </figure>
-        <figure>
-          <img src="assets/screenshot-notebook.png" width="1280" height="800" loading="lazy" alt="The product notebook popup listing saved products with source cost, landed cost, Shopify price and margin">
+        <figure class="zoom" id="shot-4">
+          <a class="lb-backdrop" href="#!" aria-label="Close enlarged view" tabindex="-1"></a>
+          <a class="shot" href="#shot-4">
+            <img src="assets/screenshot-notebook.png" width="1280" height="800" loading="lazy" alt="The product notebook popup listing saved products with source cost, landed cost, Shopify price and margin">
+          </a>
           <figcaption>The product notebook: every saved product with source cost, landed cost, Shopify price and margin — kept in your browser.</figcaption>
+          <a class="lb-close" href="#!" aria-label="Close enlarged view">&times;</a>
         </figure>
       </div>
     </div>
