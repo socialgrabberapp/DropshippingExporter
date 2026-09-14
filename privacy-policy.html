@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>隐私政策 / Privacy Policy — 1688/速卖通采集铺货助手</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+         font: 15px/1.75 -apple-system, "Segoe UI", "Microsoft YaHei", Roboto, sans-serif; }
+  h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+  h2 { font-size: 1.1rem; margin-top: 2.25rem; border-left: 3px solid #2b6cb0; padding-left: .6rem; }
+  h3 { font-size: 1rem; margin-top: 1.75rem; }
+  .meta { color: #667085; font-size: .875rem; margin-bottom: 2rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .9rem; }
+  th, td { border: 1px solid #d0d5dd; padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #f2f4f7; font-weight: 600; }
+  code { background: #f2f4f7; padding: .1em .35em; border-radius: 3px; font-size: .875em; }
+  #en { margin-top: 3rem; border-top: 2px solid #d0d5dd; padding-top: 1rem; }
+  footer { margin-top: 3rem; color: #667085; font-size: .8rem; }
+</style>
+</head>
+<body>
+
+<h1>隐私政策 <span style="font-weight:400">/</span> Privacy Policy</h1>
+<p class="meta">
+  1688/速卖通采集铺货助手（<em>1688/AliExpress to Shopify Importer</em>）<br>
+  生效日期 / Effective date：<strong>2026-09-10</strong> ｜ 版本 / Version：0.6.0<br>
+  联系方式 / Contact：<a href="mailto:socialgrabber.app@gmail.com">socialgrabber.app@gmail.com</a>
+</p>
+
+<h2>中文</h2>
+
+<p>本扩展是一款在你自己的浏览器里运行的商品数据处理工具。它的核心设计是<strong>没有服务器</strong>：不注册、不登录、不需要你提供店铺 API 密钥，没有统计或广告脚本，也不主动连接除商品页之外的任何地址。</p>
+
+<h3>一、本扩展不收集、不上传的任何东西</h3>
+<ul>
+  <li>不收集身份信息：不需要邮箱、手机号、账号，扩展内没有任何会让你提交这些的表单。</li>
+  <li>不上传商品数据：你在 1688 / 速卖通商品页上看到的标题、价格、变体、图片地址，全部在<strong>你自己的浏览器内存里</strong>解析。</li>
+  <li>不上传店铺数据：导出的 CSV 与图片 zip 是你主动下载到本机的文件，不经过任何第三方。</li>
+  <li>不读取你的登录态、Cookie、站内消息或支付信息；不修改你在源站发出的任何请求。</li>
+  <li>没有埋点、没有分析、没有广告、没有跨站追踪。</li>
+</ul>
+
+<h3>二、这个扩展会发出哪些请求</h3>
+<p>它不发起任何"把数据发给某个服务"的请求，也不查询汇率、天气、地址库之类的第三方接口。全部网络行为只有三类，前两类其实不是扩展的行为：</p>
+<table>
+  <tr><th>请求</th><th>由谁发起</th><th>目的地</th><th>内容</th></tr>
+  <tr><td>加载商品页</td><td><strong>你自己</strong>（在地址栏输入或点链接）</td><td>1688 / 速卖通</td><td>就是你正常浏览这个页面时浏览器本来就会发的那些请求</td></tr>
+  <tr><td>读取页面上已有的商品数据</td><td>扩展在你打开的那个页面里，<strong>内存中读取，不产生新请求</strong></td><td>—</td><td>无出网：解析结果只在你的浏览器里</td></tr>
+  <tr><td>保存本地图片备份</td><td>你主动点击"打包图片"</td><td><strong>该商品页自己的公开图片地址</strong></td><td>GET，不带任何 Cookie 或登录信息（<code>credentials: 'omit'</code>），不需要 API key</td></tr>
+</table>
+<p>第三项值得说清楚：CSV 里引用的图片本来就是源站公开可访问的地址（Shopify 导入时是 Shopify 的服务器去访问它们）；只有当你希望"源站抓不动图时手里还有备份"，你才会点这颗按钮，此时扩展只是<strong>用你的浏览器去取你屏幕上已经显示出来的那几张图</strong>，并发不超过 3 张，取不到就跳过，不会重试打源站。</p>
+<p>除此之外没有任何地址被访问。你可以在浏览器开发者工具的网络面板里核对：正常浏览几个商品页，除了源站自己的请求，不会出现任何陌生的第三方域名。</p>
+
+<h3>三、存在你本机的数据</h3>
+<table>
+  <tr><th>数据</th><th>位置</th><th>内容</th><th>删除方式</th></tr>
+  <tr><td>定价参数</td><td><code>chrome.storage.sync</code></td><td>运费单价、期望利润、毛利率、结算币种、<strong>你手填的汇率以及它被填入的那一天</strong>、图片筛选偏好、界面语言</td><td>面板里改参数即覆盖；卸载时由 Chrome 清除</td></tr>
+  <tr><td>我的爆款灵感库</td><td><code>chrome.storage.local</code></td><td>你导出过的商品记录（标题、源链接、价格、成本、毛利率、图片数量），最多 200 条</td><td>Popup 看板逐条删除或一键清空；卸载时由 Chrome 清除</td></tr>
+</table>
+<p>汇率是本扩展唯一一处不由你提供、又要参与算价的数字，因此它<strong>只认你手填的那一个值</strong>：面板会标出这个汇率是你哪天填的，距今超过 7 天会变成红色提示你核对。扩展自己不去查、也不从任何地方接收。</p>
+<p>以上数据<strong>不会</strong>被传输给开发者或任何第三方。同步使用的是 Google 为 Chrome 扩展提供的 <code>storage.sync</code> 机制，受 Chrome 同步服务自身的隐私政策约束。</p>
+
+<h3>四、导出文件里的图片</h3>
+<p>为了让 Shopify 导入时能自动抓取图片，CSV 的图片列引用<strong>源站公开可访问的图片地址</strong>；Shopify 执行导入时，是 Shopify 的服务器去访问这些地址。你也可以选择把图片打包下载成本地 zip 作为备份，这一动作完全发生在你自己的电脑上。</p>
+
+<h3>五、未满 13 岁用户</h3>
+<p>本扩展面向电商从业者，不针对儿童，不主动收集任何人的个人信息。</p>
+
+<h3>六、政策变更</h3>
+<p>如果本政策的适用范围发生变化（例如新增任何对外请求），我们会更新本页面并修改生效日期。有疑问请联系：<a href="mailto:socialgrabber.app@gmail.com">socialgrabber.app@gmail.com</a>。</p>
+
+<div id="en">
+<h2>English</h2>
+
+<p>This extension is a product-data tool that runs entirely inside your browser. It has <strong>no server</strong>: no sign-up, no login, no store API keys, no analytics or advertising code, and no contact with any address other than the product page you are already viewing.</p>
+
+<h3>1. What is never collected or uploaded</h3>
+<ul>
+  <li>No identity data — it never asks for or stores your email, phone number or credentials.</li>
+  <li>No product data is uploaded: titles, prices, variants and image addresses on a 1688 / AliExpress page are parsed in your own browser's memory.</li>
+  <li>No store data is uploaded: the exported CSV and image zip are files you explicitly choose to download to your computer.</li>
+  <li>Your login state, cookies, messages and payment information are not read, and no request you send to the marketplace is modified.</li>
+  <li>No telemetry, no analytics, no ads, no cross-site tracking.</li>
+</ul>
+
+<h3>2. Which requests this extension makes</h3>
+<p>It never sends your data to a service, and it does not call any third-party API — not even for exchange rates. Every network action falls into one of three rows, and the first two are not the extension's doing:</p>
+<table>
+  <tr><th>Request</th><th>Who starts it</th><th>Destination</th><th>Payload</th></tr>
+  <tr><td>Loading a product page</td><td><strong>You</strong> (typing a URL or clicking a link)</td><td>1688 / AliExpress</td><td>Exactly the requests your browser would send anyway</td></tr>
+  <tr><td>Reading the product data on that page</td><td>The extension, <strong>in memory, creating no request</strong></td><td>—</td><td>Nothing leaves the tab</td></tr>
+  <tr><td>Saving a local image backup</td><td>Only when you click "pack images"</td><td><strong>That page's own public image URLs</strong></td><td>GET, sent with <code>credentials: 'omit'</code> — no cookies, no session, no API key</td></tr>
+</table>
+<p>About the third row: the image rows in the CSV point at the marketplace's public image URLs, so Shopify fetches them from its own servers during import. You only press that button when you want a copy on your own disk in case Shopify cannot pull them; the extension then simply uses your browser to retrieve the images already shown on your screen, three at a time, skipping any it cannot fetch rather than hammering the source.</p>
+<p>Nothing else is ever contacted. You can verify this in your browser's network panel while browsing several product pages: no unfamiliar third-party domain appears.</p>
+
+<h3>3. Data that stays on your device</h3>
+<p><code>chrome.storage.sync</code> holds your pricing parameters (freight rate, expected profit, margin, settlement currency, <strong>the exchange rate you type in yourself and the day you typed it</strong>, image-filter preferences, interface language). <code>chrome.storage.local</code> holds your "bestsellers" notebook — up to 200 records of products you exported (title, source URL, price, cost, margin, image count), deletable one by one or in full from the popup. Chrome clears both areas on uninstall.</p>
+<p>The exchange rate is the one number in this tool that is neither yours nor something visible on the page, so it is <strong>only ever what you type</strong>: the panel shows the date you entered it and turns red once it is more than 7 days old. The extension does not look rates up and does not receive them from anywhere. None of the above is transmitted to us or to any third party; <code>storage.sync</code> is Google's Chrome Sync mechanism, governed by Chrome's own privacy notice.</p>
+
+<h3>4. Images in the exported file</h3>
+<p>The image rows in the CSV reference the marketplace's own public image URLs so that Shopify can fetch them during import; when you import, Shopify's servers request those URLs. You may optionally save local copies as a zip — that action stays on your computer.</p>
+
+<h3>5. Children</h3>
+<p>Intended for e-commerce professionals; not directed at children, and no personal information is knowingly collected.</p>
+
+<h3>6. Changes</h3>
+<p>If the scope of this policy changes — for example, if any additional outbound request is added — this page will be updated and the effective date changed. Contact: <a href="mailto:socialgrabber.app@gmail.com">socialgrabber.app@gmail.com</a>.</p>
+</div>
+
+<footer>© 2026 <a href="mailto:socialgrabber.app@gmail.com">socialgrabber.app@gmail.com</a> · 本页为静态文本，不加载任何第三方资源，也不使用 Cookie。</footer>
+</body>
+</html>
